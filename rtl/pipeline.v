@@ -53,8 +53,8 @@ module pipeline(
 
   logic [4:0] counter;
   initial counter = 0;
-  always_ff @(posedge clk) counter = counter + 1;
-  always_ff @(posedge clk) if(counter == 5) assert(a2_output == 2);
+  //always_ff @(posedge clk) counter = counter + 1;
+  //always_ff @(posedge clk) if(counter == 5) assert(a2_output == 2);
  `endif
 endmodule // pipeline
 
@@ -82,7 +82,23 @@ module delayer(
   input  var logic [4:0] input_num,
   output var logic [4:0] output_num
 );
+  logic [1:0] counter;
+  always_ff @(posedge clk) begin
+    if(reset) begin
+      counter <= 0;
+    end else begin
+      counter <= counter + 1;
+    end
+  end
   always_ff @(posedge clk) begin
     output_num <= input_num;
   end
+ `ifdef FORMAL
+  logic clocked;
+  initial clocked = 0;
+  always_ff @(posedge clk) clocked <= reset ? 0 : 1;
+  always_ff @(posedge clk) if(clocked && $stable(!reset) && $past(counter) < 2'b11) assert(counter == $past(counter) + 1);
+  always_ff @(posedge clk) if(clocked && $stable(!reset) && $past(counter) == 2'b11) assert(counter == 2'b00);
+  always_ff @(posedge clk) if(!reset && $past(reset)) assert(counter == 2'b00);
+ `endif
 endmodule
