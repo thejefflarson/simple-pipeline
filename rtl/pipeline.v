@@ -82,4 +82,7 @@ module delayer(
   input  var logic [4:0] input_num,
   output var logic [4:0] output_num
 );
+  always_ff @(posedge clk) begin
+    output_num <= input_num;
+  end
 endmodule

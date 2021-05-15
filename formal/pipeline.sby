@@ -1,0 +1,12 @@
+[options]
+mode prove
+
+[engines]
+smtbmc
+
+[script]
+read -formal pipeline.v
+prep -top pipeline
+
+[files]
+../rtl/pipeline.v
