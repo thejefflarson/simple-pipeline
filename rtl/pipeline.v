@@ -96,9 +96,10 @@ module delayer(
  `ifdef FORMAL
   logic clocked;
   initial clocked = 0;
+  // delay for a cycle before we start counting
   always_ff @(posedge clk) clocked <= reset ? 0 : 1;
-  always_ff @(posedge clk) if(clocked && $stable(!reset) && $past(counter) < 2'b11) assert(counter == $past(counter) + 1);
-  always_ff @(posedge clk) if(clocked && $stable(!reset) && $past(counter) == 2'b11) assert(counter == 2'b00);
+  always_ff @(posedge clk) if(clocked && $past(counter) < 2'b11) assert(counter == $past(counter) + 1);
+  always_ff @(posedge clk) if(clocked && $past(counter) == 2'b11) assert(counter == 2'b00);
   always_ff @(posedge clk) if(!reset && $past(reset)) assert(counter == 2'b00);
  `endif
 endmodule
